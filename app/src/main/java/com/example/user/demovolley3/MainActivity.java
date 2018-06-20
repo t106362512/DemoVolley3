@@ -14,9 +14,11 @@ import android.widget.SimpleAdapter;
 import android.widget.Toast;
 
 import com.android.volley.Request;
+import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -51,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void download(String url) {
+        RequestQueue queue = Volley.newRequestQueue(this);
         JsonObjectRequest jsObjRequest = new JsonObjectRequest(
                 Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
             @Override
@@ -59,7 +62,6 @@ public class MainActivity extends AppCompatActivity {
                 String ID = null, userid = null, temperature = null, datetime = null;
                 try {
                     JSONArray jsonArray = response.getJSONArray("myJSON");
-                    //System.out.println(jsonArray.length());
                     int count = jsonArray.length() - 1;     //count 用來倒著顯示
                     while (true) {
                         ID = ((JSONObject) (jsonArray.get(count))).getString("ID");    //到 JSON FORMATTOR 網站 整理 JSON 內容
@@ -93,7 +95,7 @@ public class MainActivity extends AppCompatActivity {
                 // TODO Auto-generated method stub
             }
         });
-        MySingleton.getInstance(this).addToRequestQueue(jsObjRequest);
+        queue.add(jsObjRequest);
     }
 
     //=======================================================================設定按鈕動作===========================================================================================

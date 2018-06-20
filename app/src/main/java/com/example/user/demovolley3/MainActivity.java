@@ -2,6 +2,7 @@ package com.example.user.demovolley3;
 
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.StrictMode;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
@@ -28,18 +29,26 @@ public class MainActivity extends AppCompatActivity {
 
     ListView listView;
     int autoRefresh_status = 0;
-    int jsonLength = 0;
+    int status_mem = 0;
+    String getJSON = "http://phpmyadmin-t106362512project.a3c1.starter-us-west-1.openshiftapps.com/examples/getJSON.php";
+
+
+    Handler handler=  new Handler();
+    Runnable myRunnable = new Runnable() {
+        public void run() {
+            download(getJSON);
+            handler.postDelayed(this,1000);
+        }
+    };
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        //mTxtDisplay = (TextView) findViewById(R.id.display);
         listView = (ListView) findViewById(R.id.listView);
-        download("http://phpmyadmin-t106362512project.a3c1.starter-us-west-1.openshiftapps.com/examples/getJSON.php");      //取得 JSON 頁面
+        download(getJSON);      //取得 JSON 頁面
     }
-
-
 
     private void download(String url) {
         JsonObjectRequest jsObjRequest = new JsonObjectRequest(
@@ -101,6 +110,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
+
             case 10:
                 if (autoRefresh_status == 0) {
                     Toast.makeText(MainActivity.this, "開啟自動更新", Toast.LENGTH_SHORT).show();
@@ -109,17 +119,28 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(MainActivity.this, "關閉自動更新", Toast.LENGTH_SHORT).show();
                     autoRefresh_status = 0;
                 }
+                if (autoRefresh_status == 1 && status_mem == 1){
+                    System.out.println("更新");
+                    handler.post(myRunnable);
+                }else{
+                    System.out.println("停止");
+                    handler.removeCallbacks(myRunnable);
+                }
                 break;
             case 20:
+                status_mem = 1;
                 changeStatus("1");      //status 為 1 => Raspberry Pi 讀取 data
                 Toast.makeText(MainActivity.this, "狀態改為'1'", Toast.LENGTH_SHORT).show();
                 break;
             case 30:
+                status_mem = 0;
+                handler.removeCallbacks(myRunnable);
                 changeStatus("0");      //status 為 0 => Raspberry Pi 停止讀取 data
                 Toast.makeText(MainActivity.this, "狀態改為'0'", Toast.LENGTH_SHORT).show();
                 break;
             case 40:
-                download("http://phpmyadmin-t106362512project.a3c1.starter-us-west-1.openshiftapps.com/examples/getJSON.php");
+                ControlPHP.refelsh();        //整理 ID 鍵值
+                download(getJSON);
                 Toast.makeText(MainActivity.this, "重新載入資料", Toast.LENGTH_SHORT).show();
                 break;
             case 50:
@@ -143,9 +164,9 @@ public class MainActivity extends AppCompatActivity {
                         if (which == DialogInterface.BUTTON_POSITIVE) {
                             String delNUM = item.getText().toString();
                             strictMode();      //檢測錯誤
-                            String r = del.MySQLI(delNUM);      //呼叫刪除程式
+                            String r = ControlPHP.del(delNUM);      //呼叫刪除程式
                             System.out.println(r);     //開發人員檢查
-                            download("http://phpmyadmin-t106362512project.a3c1.starter-us-west-1.openshiftapps.com/examples/getJSON.php");
+                            download(getJSON);
                             //Toast.makeText(MainActivity.this, "刪除", Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -162,8 +183,8 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void changeStatus(String s) {
-        strictMode();       //檢測錯誤
-        String r = status.MySQLI(s);    //改變狀態
+        //strictMode();       //檢測錯誤
+        String r = ControlPHP.status(s);    //改變狀態
         System.out.println(r);
     }
 
@@ -181,4 +202,5 @@ public class MainActivity extends AppCompatActivity {
                 .penaltyDeath()
                 .build());
     }
+
 }

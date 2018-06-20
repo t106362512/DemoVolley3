@@ -183,7 +183,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void changeStatus(String s) {
-        //strictMode();       //檢測錯誤
+        strictMode();       //檢測錯誤
         String r = ControlPHP.status(s);    //改變狀態
         System.out.println(r);
     }

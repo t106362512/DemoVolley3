@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
     Runnable myRunnable = new Runnable() {
         public void run() {
             download(getJSON);
-            handler.postDelayed(this,1000);
+            handler.postDelayed(this, 2000);
         }
     };
 

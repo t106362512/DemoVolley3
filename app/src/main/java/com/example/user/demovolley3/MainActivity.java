@@ -53,7 +53,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void download(String url) {
-        RequestQueue queue = Volley.newRequestQueue(this);
         JsonObjectRequest jsObjRequest = new JsonObjectRequest(
                 Request.Method.GET, url, null, new Response.Listener<JSONObject>() {
             @Override
@@ -95,7 +94,7 @@ public class MainActivity extends AppCompatActivity {
                 // TODO Auto-generated method stub
             }
         });
-        queue.add(jsObjRequest);
+        MySingleton.getInstance(this).addToRequestQueue(jsObjRequest);
     }
 
     //=======================================================================設定按鈕動作===========================================================================================
